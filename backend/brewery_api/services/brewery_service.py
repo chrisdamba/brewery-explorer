@@ -3,61 +3,35 @@ from typing import Dict, List, Any, Optional
 
 
 class BreweryService:
-    """Service to interact with Open Brewery DB API"""
+    """Service to interact with Open Brewery DB API v1"""
 
-    BASE_URL = "https://api.openbrewerydb.org/breweries"
+    BASE_URL = "https://api.openbrewerydb.org/v1/breweries"
 
     @classmethod
     def get_breweries(cls, params: Optional[Dict] = None) -> List[Dict[str, Any]]:
-        """
-        Fetch breweries from the Open Brewery DB API with optional filters
-
-        Args:
-            params: Optional dictionary of query parameters for filtering
-
-        Returns:
-            List of brewery dictionaries
-        """
+        """Fetch breweries with optional filters"""
         try:
             response = requests.get(cls.BASE_URL, params=params)
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
-            # Log error in production
             print(f"Error fetching breweries: {e}")
             return []
 
     @classmethod
     def get_brewery_by_id(cls, brewery_id: str) -> Dict[str, Any]:
-        """
-        Fetch a specific brewery by ID
-
-        Args:
-            brewery_id: Brewery ID to fetch
-
-        Returns:
-            Dictionary with brewery details
-        """
+        """Fetch a specific brewery by ID"""
         try:
             response = requests.get(f"{cls.BASE_URL}/{brewery_id}")
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
-            # Log error in production
             print(f"Error fetching brewery {brewery_id}: {e}")
             return {}
 
     @classmethod
     def search_breweries(cls, query: str) -> List[Dict[str, Any]]:
-        """
-        Search breweries by keyword
-
-        Args:
-            query: Search term
-
-        Returns:
-            List of matching brewery dictionaries
-        """
+        """Search breweries by keyword"""
         try:
             response = requests.get(f"{cls.BASE_URL}/search", params={"query": query})
             response.raise_for_status()
@@ -67,33 +41,41 @@ class BreweryService:
             return []
 
     @classmethod
-    def get_random_brewery(cls) -> Dict[str, Any]:
-        """
-        Get a random brewery
-
-        Returns:
-            Dictionary with random brewery details
-        """
+    def get_random_brewery(cls, size: int = 1) -> List[Dict[str, Any]]:
+        """Get random breweries"""
         try:
-            response = requests.get(f"{cls.BASE_URL}/random")
+            response = requests.get(f"{cls.BASE_URL}/random", params={"size": size})
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
             print(f"Error fetching random brewery: {e}")
+            return []
+
+    @classmethod
+    def get_autocomplete(cls, query: str) -> List[Dict[str, Any]]:
+        """Get autocomplete suggestions for a query"""
+        try:
+            response = requests.get(f"{cls.BASE_URL}/autocomplete", params={"query": query})
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching autocomplete: {e}")
+            return []
+
+    @classmethod
+    def get_metadata(cls, params: Optional[Dict] = None) -> Dict[str, Any]:
+        """Get metadata about breweries with optional filters"""
+        try:
+            response = requests.get(f"{cls.BASE_URL}/meta", params=params)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching metadata: {e}")
             return {}
 
     @classmethod
     def group_breweries_by_attribute(cls, breweries: List[Dict], attribute: str) -> Dict[str, List]:
-        """
-        Group breweries by a given attribute
-
-        Args:
-            breweries: List of brewery dictionaries
-            attribute: Attribute to group by
-
-        Returns:
-            Dictionary with groups as keys and lists of breweries as values
-        """
+        """Group breweries by attribute"""
         grouped = {}
         for brewery in breweries:
             key = brewery.get(attribute, 'unknown')
