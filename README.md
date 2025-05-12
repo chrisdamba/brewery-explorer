@@ -2,6 +2,8 @@
 
 A full-stack application for exploring breweries using the Open Brewery DB API. Built with Django, Vue.js, and D3.js for data visualization.
 
+![Brewery Explorer Page](app-grouped.png)
+
 ## Table of Contents
 - [Features](#features)
 - [Tech Stack](#tech-stack)
